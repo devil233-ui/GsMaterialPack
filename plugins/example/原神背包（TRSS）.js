@@ -1,3 +1,4 @@
+//开发维护&&反馈群190370034
 import plugin from '../../lib/plugins/plugin.js'
 import puppeteer from '../../lib/puppeteer/puppeteer.js'
 import fetch from 'node-fetch'
@@ -122,6 +123,8 @@ export class MyMaterialPack extends plugin {
     if (!uid) return false
     let { ck } = await MysInfo.checkUidBing(uid, this.e) || {}
     if (!ck) return this.e.reply(MysInfo.tips), false
+
+    await this.e.reply('正在获取最新材料数据，请稍候...')
 
     let rawMaterials = await this.fetchRawMaterials(uid, ck)
     let { role } = (await MysInfo.get(this.e, 'index')).data || {}
