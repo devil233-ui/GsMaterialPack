@@ -26,7 +26,7 @@
     {{each material val}}
     <div class="material">
       {{ set iconPath = pluResPath + `../../miao-plugin/resources/meta-gs/material/${type}/${val.name}.webp` }}
-      {{ set useLocalIcon = ['weekly', 'talent', 'weapon', 'boss', 'gem', 'specialty', 'monster', 'normal'].includes(type) }}
+      {{ set useLocalIcon = ['weekly', 'talent', 'weapon', 'boss', 'gem', 'specialty', 'monster', 'normal'].includes(type) && val.name !== '智识之冕' }}
       
       <img class="item-icon star{{val.level}}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
       <div class="label-icon {{type}}" style="background-image:url({{if useLocalIcon}}{{iconPath}}{{else}}{{val.icon}}{{/if}})"></div>

@@ -128,72 +128,79 @@ export class MyMaterialPack extends plugin {
         if (p.includes('角色培养')) return 'boss'
         if (p.includes('角色突破')) return 'gem'
         if (p.includes('收集物') || p.includes('宝箱') || p.includes('道具')) return 'adventureItem'
+        if (p.includes('普通')) return 'normal'
+        if (p.includes('精英') || p.includes('首领')) return 'monster'
         if (p.includes('角色与武器培养')) return 'monster'
         if (p.includes('木材')) return 'wood'
       }
       return 'other'
     }
 
-    //大地图接口
+    // 大地图接口
     try {
       let mapUrl = "https://api-takumi.mihoyo.com/common/map_user/ys_obc/v1/user/sync_game_material_info?map_id=2&app_sn=ys_obc&lang=zh-cn"
       let mapRes = await fetch(mapUrl, { headers: { "Cookie": ck, "Referer": "https://act.mihoyo.com" } }).then(res => res.json())
       if (mapRes?.retcode === 0) {
         for (let [id, num] of Object.entries(mapRes.data.material_info)) {
-          if (num <= 0 || !dict[id]) continue
-          let type = getDynamicType({ id: Number(id), name: dict[id].name })
-          mergedData.set(dict[id].name, { id: Number(id), name: dict[id].name, num, icon: dict[id].icon, type })
+          if (num <= 0) continue
+          let name = dict[id]?.name || Material.get(Number(id))?.name
+          if (!name) continue
+          
+          let icon = dict[id]?.icon || ''
+          let type = getDynamicType({ id: Number(id), name })
+          mergedData.set(name, { id: Number(id), name, num, icon, type })
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('大地图接口错误:', e)
+    }
 
     let region = (String(uid)[0] === '1' || String(uid)[0] === '2') ? 'cn_gf01' : 'cn_qd01'
-
-    //记录角色消耗的摩拉
-    let avatarMora = 0; 
-    let silentE = { ...this.e, reply: () => {} }
 
     for (let file of ['avatarCompute.json', 'weaponCompute.json']) {
       try {
         let body = await this.getRemoteJson(file)
         if (!body) continue
-
-        let res = await MysInfo.get(silentE, 'compute', { 
-          body: { ...body, uid: String(uid), region } 
-        })
+        
+        let silentE = { ...this.e, reply: () => {} }
+        let res = await MysInfo.get(silentE, 'compute', { body: { ...body, uid: String(uid), region } })
         
         if (res?.retcode === 0 && res.data?.overall_consume) {
-          res.data.overall_consume.forEach(val => {
-            let owned = val.lack_num < 0 ? Math.abs(val.lack_num) + val.num : val.num - val.lack_num
-            if (owned > 0) {
-              
-              // 👇 核心去重逻辑：单独拦截“摩拉”
-              if (val.name === '摩拉') {
-                if (file === 'avatarCompute.json') {
-                  avatarMora = owned; // 存下角色的摩拉
-                } else if (file === 'weaponCompute.json') {
-                  owned = Math.max(0, owned - avatarMora); // 武器的摩拉扣除角色的部分
-                  if (owned === 0) return; // 扣完没剩的直接跳过
+            res.data.overall_consume.forEach(val => {
+              let owned = val.lack_num < 0 ? Math.abs(val.lack_num) + val.num : val.num - val.lack_num
+              if (owned > 0) {
+                if (mergedData.has(val.name)) {
+                  // 数量不应累加，直接赋等值覆盖。彻底根除摩拉和所有材料的重复计算问题
+                  mergedData.get(val.name).num = owned
+                } else {
+                  
+                  let type = getDynamicType(val)
+                  mergedData.set(val.name, { id: val.id, name: val.name, num: owned, icon: val.icon, type })
                 }
               }
-
-              if (mergedData.has(val.name)) {
-                mergedData.get(val.name).num += owned
-              } else {
-                let type = getDynamicType(val)
-                mergedData.set(val.name, { id: val.id, name: val.name, num: owned, icon: val.icon, type })
-              }
-            }
-          })
-        }
-      } catch (e) {}
+            })
+          }
+      } catch (e) {
+        console.error(`处理 ${file} 时出错:`, e)
+      }
     }
 
     let ret = { length: 0 }
     for (let item of mergedData.values()) {
       ret[item.type] ||= []; ret[item.type].push(item); ret.length++
     }
-    for (let i in ret) { if (Array.isArray(ret[i])) ret[i].sort((a, b) => b.id - a.id) }
+    for (let i in ret) { 
+      if (Array.isArray(ret[i])) {
+        ret[i].sort((a, b) => {
+          // 给摩拉和智识之冕打装置顶权重
+          let aTop = (a.name === '摩拉' || a.name === '智识之冕') ? 1 : 0
+          let bTop = (b.name === '摩拉' || b.name === '智识之冕') ? 1 : 0
+          
+          if (aTop !== bTop) return bTop - aTop
+          return b.id - a.id // 如果都不是，或者都是，则继续按 ID 降序排列
+        })
+      } 
+    }
     return ret
   }
 
@@ -204,15 +211,24 @@ export class MyMaterialPack extends plugin {
       let res = await fetch(url).then(res => res.json())
       if (res?.retcode === 0) {
         let dict = {}
-        res.data.tree.forEach(cat => {
-          cat.children?.forEach(item => {
-            dict[item.id] = { name: item.name, icon: item.icon, parent: cat.name }
+        
+        const flatten = (nodes, parentPath) => {
+          nodes.forEach(node => {
+            let currentPath = [...parentPath, node.name]
+            if (node.children && node.children.length > 0) {
+              flatten(node.children, currentPath)
+            } else {
+              dict[node.id] = { name: node.name, icon: node.icon, parent: currentPath.join('-') }
+            }
           })
-        })
+        }
+        flatten(res.data.tree, [])
         this.mapDict = dict
         return dict
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('获取大地图字典报错:', e)
+    }
     return {}
   }
 
@@ -221,14 +237,20 @@ export class MyMaterialPack extends plugin {
       let url = `https://raw.githubusercontent.com/devil233-ui/GsMaterialPack/master/data/${fileName}`
       let res = await fetch(url, {
         headers: { 'Authorization': `token ${this.GH_PAT}`, 'Accept': 'application/vnd.github.v3.raw' }
-      }).then(res => res.json())
-      return res
-    } catch (e) { return null }
+      })
+      let text = await res.text()
+      text = text.replace(/,\s*([\]}])/g, '$1') // 防呆，忽略多余逗号
+      return JSON.parse(text)
+    } catch (e) { 
+      return null 
+    }
   }
 
   async materialsWeekly() {
     if (this.e.isSr) return this.reply('该功能暂不支持星铁')
     let data = await this.getMaterialsData('weekly', false, false)
+    if (!data) return
+    
     let weeklyBossDict = await this.getRemoteJson('weeklyBoss.json')
     let weeklyList = Array.isArray(weeklyBossDict) ? weeklyBossDict : (weeklyBossDict?.data || [])
     
