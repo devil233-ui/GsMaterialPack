@@ -14,10 +14,9 @@
 </div>
 
 {{ set typeMap = { 
-    Weekly:'周本掉落', Talent:'角色天赋素材', Weapon:'武器突破素材', 
-    Specialty:'区域特产', Monster:'精英敌人掉落', Normal:'普通敌人掉落',
-    Ore:'锻造用矿石', Ingredient:'食材', Material:'素材', AdventureItem:'冒险道具',
-    Other:'其他消耗品' 
+    weekly:'周本掉落', talent:'角色天赋素材', weapon:'武器突破素材', boss:'角色培养素材',gem:'角色突破素材',
+    specialty:'区域特产', monster:'精英敌人掉落', normal:'普通敌人掉落',
+    ore:'锻造用矿石', wood:'木材', adventureItem:'冒险道具',other:'其他' 
 } }}
 <div class="info_box">
   {{each materials material type}}
@@ -27,8 +26,10 @@
     {{each material val}}
     <div class="material">
       {{ set iconPath = pluResPath + `../../miao-plugin/resources/meta-gs/material/${type}/${val.name}.webp` }}
-      <img class="item-icon star{{val.level}}" />
-      <div class="label-icon {{type}}" style="background-image:url({{if type !== 'other'}}{{iconPath}}{{else}}{{val.icon}}{{/if}})"></div>
+      {{ set useLocalIcon = ['weekly', 'talent', 'weapon', 'boss', 'gem', 'specialty', 'monster', 'normal'].includes(type) }}
+      
+      <img class="item-icon star{{val.level}}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <div class="label-icon {{type}}" style="background-image:url({{if useLocalIcon}}{{iconPath}}{{else}}{{val.icon}}{{/if}})"></div>
 
       <span>{{val.name}}</span>
       <div class="num">{{val.num}}</div>
