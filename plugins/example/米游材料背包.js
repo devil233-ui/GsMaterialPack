@@ -94,7 +94,6 @@ export class HoyoMaterialPack extends plugin {
     if (!binding.ck) return this.e.reply(MysInfo.tips), false
     let ck = binding.ck;
 
-    // await this.e.reply(`正在拉取${this.e.isSr ? '崩铁' : '原神'}材料背包，请稍等...`)
     await this.e.reply(`正在拉取相应的米游材料背包数据，请稍等...`)
 
     let raw;
@@ -373,7 +372,7 @@ export class HoyoMaterialPack extends plugin {
       await sleep(200); 
     }
 
-    console.log(`[绝区零背包] 轰炸完成，成功响应: ${successCount}/${payloads.length}，抓取总数: ${mergedData.size} 种`);
+    await this.e.reply(`[绝区零背包] 成功率: ${successCount}/${payloads.length}，抓取总数: ${mergedData.size} 种`);
 
     const getDynamicTypeZzz = (name, srcSet) => {
       if (name.includes('丁尼') || name.includes('记录') || name.includes('模块') || name.includes('电池') || name.includes('涂剂')) return 'exp';
@@ -619,7 +618,7 @@ export class HoyoMaterialPack extends plugin {
       }));
       await sleep(125); 
     }
-    console.log(`[米游背包] 测算成功率: ${successCount}/${payloads.length}，抓取总数: ${mergedData.size} 种`);
+    await this.e.reply(`[崩铁背包] 成功率: ${successCount}/${payloads.length}，抓取总数: ${mergedData.size} 种`);
 
     const getDynamicTypeSr = (name, purpose = '') => {
       if (purpose) {
