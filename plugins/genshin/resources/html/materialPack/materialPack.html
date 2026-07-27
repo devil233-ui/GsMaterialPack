@@ -87,7 +87,7 @@
     {{each material val}}
     <div class="material">
       {{ set iconPath = pluResPath + '../../miao-plugin/resources/meta-gs/material/' + type + '/' + val.name + '.webp' }}
-      {{ set useLocalIcon = !isSr && !isZzz && ['weekly', 'talent', 'weapon', 'boss', 'gem', 'specialty', 'monster', 'normal'].includes(type) && val.name !== '智识之冕' }}
+      {{ set useLocalIcon = !isSr && !isZzz && ['weekly', 'talent', 'weapon', 'boss', 'gem', 'monster', 'normal'].includes(type) && val.name !== '智识之冕' }}
       
       <img class="item-icon star{{val.level || (isSr ? 4 : 1)}}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
       
