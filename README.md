@@ -22,14 +22,8 @@
 
 在 Miao-Yunzai 或 TRSS-Yunzai 根目录下执行：
 ```sh
-git clone git@github.com:devil233-ui/HoyoMaterialPack.git "./plugins/HoyoMaterialPack"
+git clone https://github.com/devil233-ui/HoyoMaterialPack.git ./plugins/HoyoMaterialPack
 ```
-更新时在 Yunzai 根目录执行：
-```sh
-git -C "./plugins/HoyoMaterialPack" pull --ff-only
-```
-
-插件文件可以任意重命名后触发重载，也可以重启 Yunzai。请不要在该目录下添加 `index.js`，否则 Yunzai 会将其作为整体插件入口处理。
 
 # Q & A
 

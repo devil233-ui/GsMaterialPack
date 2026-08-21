@@ -92,6 +92,7 @@ export class HoyoMaterialPack extends plugin {
         timeout: 60000,
         waitUntil: "domcontentloaded",
       },
+      waitForImages: isAll ? 15000 : 5000,
     });
     if (img) await this.reply(img);
   }
@@ -579,6 +580,7 @@ export class HoyoMaterialPack extends plugin {
       ...data,
       tplFile: `./plugins/HoyoMaterialPack/resources/html/materialPack/materialWeeklyPack.html`,
       pluResPath: `${this._path}/plugins/HoyoMaterialPack/resources/`,
+      waitForImages: 5000,
     });
     if (img) await this.reply(img);
   }
