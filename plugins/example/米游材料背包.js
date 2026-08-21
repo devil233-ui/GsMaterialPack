@@ -25,7 +25,7 @@ export class HoyoMaterialPack extends plugin {
   constructor() {
     super({
       name: "米游材料背包",
-      dsc: "外部动态分类+内置字典材料背包(原铁绝)",
+      dsc: "全局动态分类材料背包(原铁绝)",
       event: "message",
       priority: -114514,
       rule: [
@@ -88,6 +88,10 @@ export class HoyoMaterialPack extends plugin {
       tplFile:
         "./plugins/genshin/resources/html/materialPack/materialPack.html",
       pluResPath: `${this._path}/plugins/genshin/resources/`,
+      pageGotoParams: {
+        timeout: 60000,
+        waitUntil: "domcontentloaded",
+      },
     });
     if (img) await this.reply(img);
   }
@@ -482,9 +486,13 @@ export class HoyoMaterialPack extends plugin {
     for (let i in ret) {
       if (Array.isArray(ret[i])) {
         ret[i].sort((a, b) => {
-          let aTop = a.name === "摩拉" ? 1 : 0;
-          let bTop = b.name === "摩拉" ? 1 : 0;
-          if (aTop !== bTop) return bTop - aTop;
+          // 摩拉置顶
+          if (a.name === "摩拉") return -1;
+          if (b.name === "摩拉") return 1;
+          // 智识之冕置底
+          if (a.name === "智识之冕") return 1;
+          if (b.name === "智识之冕") return -1;
+          // 其余按 id 降序
           return b.id - a.id;
         });
       }
