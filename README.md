@@ -20,17 +20,16 @@
 
 # 使用
 
-在 Miao-Yunzai 或 TRSS-Yunzai 根目录下执行并进行任意重命名或重启。
+在 Miao-Yunzai 或 TRSS-Yunzai 根目录下执行：
 ```sh
-curl -o "./plugins/example/米游材料背包.js" "https://raw.githubusercontent.com/devil233-ui/HoyoMaterialPack/refs/heads/master/plugins/example/%E7%B1%B3%E6%B8%B8%E6%9D%90%E6%96%99%E8%83%8C%E5%8C%85.js"
+git clone git@github.com:devil233-ui/HoyoMaterialPack.git "./plugins/HoyoMaterialPack"
 ```
-如果装有 TRSS-plugin , 可发送如下指令给机器人并进行任意重命名或重启。
+更新时在 Yunzai 根目录执行：
 ```sh
-rcp curl -o "./plugins/example/米游材料背包.js" "https://raw.githubusercontent.com/devil233-ui/HoyoMaterialPack/refs/heads/master/plugins/example/%e7%b1%b3%e6%b8%b8%e6%9d%90%e6%96%99%e8%83%8c%e5%8c%85.js"
+git -C "./plugins/HoyoMaterialPack" pull --ff-only
 ```
-</details>
 
-然后下载resources文件夹放入genshin即可。
+插件文件可以任意重命名后触发重载，也可以重启 Yunzai。请不要在该目录下添加 `index.js`，否则 Yunzai 会将其作为整体插件入口处理。
 
 # Q & A
 

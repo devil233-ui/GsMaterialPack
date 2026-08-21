@@ -86,8 +86,8 @@ export class HoyoMaterialPack extends plugin {
     let img = await puppeteer.screenshot("materialPack", {
       ...data,
       tplFile:
-        "./plugins/genshin/resources/html/materialPack/materialPack.html",
-      pluResPath: `${this._path}/plugins/genshin/resources/`,
+        "./plugins/HoyoMaterialPack/resources/html/materialPack/materialPack.html",
+      pluResPath: `${this._path}/plugins/HoyoMaterialPack/resources/`,
       pageGotoParams: {
         timeout: 60000,
         waitUntil: "domcontentloaded",
@@ -184,7 +184,7 @@ export class HoyoMaterialPack extends plugin {
     console.log(`[米游背包] 探针：最终渲染大类包含 ->`, Object.keys(materials));
 
     return {
-      _res_path: `${path.resolve("./plugins/genshin/resources")}/`,
+      _res_path: `${path.resolve("./plugins/HoyoMaterialPack/resources")}/`,
       _miao_path: `${path.resolve("./plugins/miao-plugin/resources")}/`,
       defaultLayout: path.join(
         path.resolve("./plugins/miao-plugin/resources"),
@@ -577,8 +577,8 @@ export class HoyoMaterialPack extends plugin {
 
     let img = await puppeteer.screenshot("materialWeeklyPack", {
       ...data,
-      tplFile: `./plugins/genshin/resources/html/materialPack/materialWeeklyPack.html`,
-      pluResPath: `${this._path}/plugins/genshin/resources/`,
+      tplFile: `./plugins/HoyoMaterialPack/resources/html/materialPack/materialWeeklyPack.html`,
+      pluResPath: `${this._path}/plugins/HoyoMaterialPack/resources/`,
     });
     if (img) await this.reply(img);
   }
